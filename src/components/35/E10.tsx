@@ -7,7 +7,7 @@ export const E10 = () => {
   const handleAddHobby = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
     if (checked) {
-      setHobbies((prevHobbies: SetStateAction<never[]>) => [...prevHobbies, name]);
+      setHobbies([...hobbies, name as never]);
     } else {
       setHobbies((prevHobbies) => prevHobbies.filter((hobby) => hobby !== name));
     }

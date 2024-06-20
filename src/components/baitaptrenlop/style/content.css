@@ -1,0 +1,7 @@
+.custom-container {
+    max-height: 100vh;
+}
+.img-fluid {
+    max-height: 70%;
+    max-width: 100%;
+}

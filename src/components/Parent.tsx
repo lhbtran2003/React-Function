@@ -1,23 +1,21 @@
-
-import React,{useState} from 'react'
-
-
+import React, { useState } from 'react'
 
 export const Parent = () => {
-    type User = {
-        id:number,
-        name: string
-    }
-    const [count, setCount] = useState(0)
-    const [name, setName] = useState('bảo trân dưỡng thê')
-   
+  const [name, setName] = useState("")
+  const [age, setAge] = useState("")
+  const [gender, setGender] = useState("true")
 
+  //useEffect : là hook can thiệp vào vòng đời của component
   return (
     <div>
-      <p>{count}</p>
-      <button onClick={() => setCount(count + 1)}>Tăng</button>
-      <p>{name}</p>
-      <button onClick={() => setName("cute")}></button>
+      <form style={{display:'grid'}}>
+        <input type="text" placeholder='nhập tên' value={name} onChange={(e) => setName(e.target.value)} />
+        <input type="text" placeholder='nhập số tuổi' value={age} onChange={(e) => setAge(e.target.value)}/>
+        <select value={gender} onChange={(e) => setAge(e.target.value)} >
+          <option value="Nam">Nam</option>
+          <option value="Nữ">Nữ</option>
+        </select>
+      </form>
     </div>
-  );
+  )
 }
