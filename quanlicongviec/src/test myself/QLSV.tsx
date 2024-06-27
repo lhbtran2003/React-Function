@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { data as initData } from "../data";
 import "./style.css";
 import { ConeStriped } from "react-bootstrap-icons";
@@ -12,7 +12,6 @@ type Person = {
   address: string;
   status: boolean;
 };
-
 
 //Tạo ra dữ liệu mẫu cho Student
 const initState = {
@@ -31,6 +30,8 @@ export const QLSV = () => {
   const [action, setAction] = useState<Action>("");
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<Person>(initState);
+  const [size, setSize] = useState(1); // kích thước phần tử trên 1 trang
+  const [currentPage, setCurrentPage] = useState(2); // số trang hiện tai
 
   const handleOpenModal = (action: Action) => {
     setIsOpen(true); //mở
@@ -61,35 +62,49 @@ export const QLSV = () => {
     setAction("");
   };
 
-  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeInput = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     let name = e.target.name;
     let value = e.target.value;
-    setSelected({...selected,[name]: value})
-    console.log(selected);   
-  }
+    setSelected({ ...selected, [name]: value });
+    console.log(selected);
+  };
 
   const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(action == "ADD") {
+    if (action == "ADD") {
       const newPerson: Person = {
-         ...selected,
-         id: data[data.length - 1].id + 1,
-         status: true,
-      }
-      setData([...data,newPerson]);
-    }
-    else { // active == "EDIT"
-      const newData =  data.map(stu => {
-        if(stu.id == selected.id) {
+        ...selected,
+        id: data[data.length - 1].id + 1,
+        status: true,
+      };
+      setData([...data, newPerson]);
+    } else {
+      // active == "EDIT"
+      const newData = data.map((stu) => {
+        if (stu.id == selected.id) {
           stu = selected;
         }
         return stu;
-      })
+      });
       setData(newData);
     }
     setIsOpen(false);
     setAction("");
-  }
+  };
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(data.length / size);
+  }, [data, size]);
+
+  // lọc các phần tử theo page và size
+  const filterData = useMemo(() => {
+    const start = (currentPage - 1) * size;
+    const end = currentPage * size;
+    // start <= index <end
+    return data.slice(start, end);
+  }, [data, currentPage, size]);
   return (
     <div>
       <>
@@ -200,35 +215,55 @@ export const QLSV = () => {
               </tbody>
             </table>
             <footer className="d-flex justify-content-end align-items-center gap-3">
-              <select className="form-select">
+              <select
+                className="form-select"
+                value={size}
+                onChange={(e) => setSize(+e.target.value)}
+              >
                 <option selected>Hiển thị 10 bản ghi trên trang</option>
                 <option>Hiển thị 20 bản ghi trên trang</option>
                 <option>Hiển thị 50 bản ghi trên trang</option>
                 <option>Hiển thị 100 bản ghi trên trang</option>
               </select>
               <ul className="pagination">
-                <li className="page-item">
-                  <a className="page-link no-focus-outline" href="#">
+                <li
+                  className={`page-item ${currentPage == 1 ? "disabled" : ""}`}
+                >
+                  <a
+                    className="page-link no-focus-outline"
+                    href="#"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
                     Previous
                   </a>
                 </li>
-                <li className="page-item">
-                  <a className="page-link no-focus-outline" href="#">
-                    1
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link no-focus-outline" href="#">
-                    2
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link no-focus-outline" href="#">
-                    3
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link no-focus-outline" href="#">
+                {Array.from(new Array(totalPages), (_, index) => index + 1).map(
+                  (page, index) => (
+                    <li
+                      className={`page-item ${
+                        currentPage == page ? "active" : ""
+                      }`}
+                    >
+                      <a
+                        onClick={() => setCurrentPage(page)}
+                        className="page-link"
+                        href="#"
+                      >
+                        {index + 1}
+                      </a>
+                    </li>
+                  )
+                )}
+                <li
+                  className={`page-item ${
+                    currentPage == totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <a
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="page-link"
+                    href="#"
+                  >
                     Next
                   </a>
                 </li>
